@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+airflow/logs/
+
+# Data directories
+data/kafka/
+data/postgres/
+data/airflow/
+
+# Airflow
+airflow.db
+airflow.cfg
+airflow-webserver.pid
+standalone_admin_password.txt
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Spark
+metastore_db/
+spark-warehouse/
+derby.log
+
+# Jupyter
+.ipynb_checkpoints/
