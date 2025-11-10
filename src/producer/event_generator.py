@@ -58,6 +58,8 @@ class TelecomEventGenerator:
         
         # Track used phone numbers for realistic patterns
         self.active_numbers = set()
+    
+    
         
     def connect_kafka(self) -> bool:
         """Connect to Kafka broker"""

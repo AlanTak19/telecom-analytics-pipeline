@@ -1,0 +1,65 @@
+# Complete shutdown one-liner
+Get-Process python* -ErrorAction SilentlyContinue | Stop-Process -Force; docker exec spark-master pkill -9 -f spark-submit 2>$null; docker-compose down; docker stop $(docker ps -aq) 2>$null; docker rm $(docker ps -aq) 2>$null; if (Test-Path "data\spark") { Remove-Item -Path "data\spark\*" -Recurse -Force -ErrorAction SilentlyContinue }; Write-Host "✅ Shutdown complete!" -ForegroundColor Green
+
+
+
+docker-compose up -d
+
+docker-compose ps
+
+python src/producer/event_generator.py --rate 10
+
+
+
+
+docker exec -it spark-master /opt/spark/bin/spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.6.0 \
+  /opt/spark-apps/streaming/spark_streaming_docker.py
+
+
+
+
+docker exec -it spark-master /opt/spark/bin/spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.6.0 \
+  /opt/spark-apps/streaming/simple_aggregations.py
+
+
+
+
+docker exec -it postgres psql -U telecom_user -d telecom_analytics -c "
+SELECT 
+    'Raw Events' as table_name, COUNT(*) 
+FROM raw_events
+UNION ALL
+SELECT 'Real-time Metrics', COUNT(*) FROM real_time_metrics
+UNION ALL
+SELECT 'Anomalies', COUNT(*) FROM anomalies;
+"
+
+
+SELECT 
+    window_start, window_end, region, event_type, count_events, total_data_gb
+FROM real_time_metrics
+WHERE metric_type = '5min'
+ORDER BY window_start DESC
+LIMIT 5;
+
+
+docker exec -it airflow-webserver python /opt/airflow/src/batch/batch_processor.py \
+  --host postgres \
+  --date 2025-11-09
+
+
+SELECT date, region, event_type, total_events, total_call_duration, total_data_mb
+FROM daily_stats
+ORDER BY total_events DESC
+LIMIT 5;
+
+
+http://localhost:8080
+
+
+
+
